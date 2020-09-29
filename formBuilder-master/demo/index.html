@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+#reportdiv {
+    min-height: 100px;
+    width: 99%;
+    background:lightyellow;
+    box-shadow: 1px 1px 2px 2px darkgrey;
+}
+</style>
+  <link rel="stylesheet" type="text/css" href="assets/css/demo.css">
+  <link rel="stylesheet" type="text/css" media="screen" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.1/jquery.rateyo.min.css">
+
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <title>formBuilder</title>
+</head>
+
+<body>
+  <div class="content">
+    <h1>Form Builder</h1>
+    <div id="stage1" class="build-wrap"></div>
+    <form class="render-wrap"></form>
+    <button id="edit-form">Edit Form</button>
+    <div class="action-buttons"></div>
+	
+	<h5><b>Enter Heading</b> </h5><input type="text" size="30" id="FormHeading"><br> 
+	<H5><b>Edit your Sentences here</b></h5>
+		<div id="reportdiv"  class="reportdiv" style="border:1px solid black;width:500px;list-style:none;height:200px;float: left;" ondrop="drop(event)" ondragover="allowDrop(event)" cols="64" name="S1" rows="20" contenteditable="true" droppable="true"></div>
+	</div>
+	<H5 align="right"><u><b>Variables in Form</b></u></h5><br/>
+	<div id="variables" style="border:1px solid black;height: 150px;width:200px;float: right;">
+	
+	<ul id="variablesList">
+	</ul>
+	</div>
+  </div><br>
+<input type="submit" value="Build" onclick="build()">
+  <script src="assets/js/vendor.js"></script>
+  <script src="assets/js/form-builder.min.js"></script>
+  <script src="assets/js/form-render.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.1/jquery.rateyo.min.js"></script>
+  <script src="assets/js/demo.js"></script>
+</body>
+<script type="text/javascript">
+var ghtml;
+var eid="";
+var varflag=0;
+
+
+
+
+jQuery(function($) {
+  let options = {
+    dataType: 'xml',
+    onSave: function(evt, formData){showPreview(formData)},
+    formData: '<form-template><fields><field name="text-input-1454163102327" class="form-control" label="Text Field" description="" required="false" type="text" /><field name="date-input-1454163105133" class="form-control" label="Date Field" description="" required="false" type="date" /><field name="checkbox-group-1454163056695" label="Checkbox Group" style="multiple" description="" required="false" type="checkbox-group"><option value="option-1">Option 1</option><option value="option-2">Option 2</option></field></fields></form-template>'
+  
+  };
+  
+  const $fbEditor = $(document.getElementById('fb-editor'));
+
+  const formBuilder = $fbEditor.formBuilder(options);
+
+  function showPreview(formData) {
+    let formRenderOpts = {
+      dataType: 'xml',
+      formData
+    };
+    let $renderContainer = $('<form/>');
+    $renderContainer.formRender(formRenderOpts);
+    let html = `<!doctype html><title>Form Preview</title><body class="container"><hr>${$renderContainer.html()}</body></html>`;
+    ghtml=html;
+	var formPreviewWindow = window.open('', 'formPreview', 'height=480,width=640,toolbar=no,scrollbars=yes');
+//console.log(html);
+	
+    formPreviewWindow.document.write(html);
+    var style = document.createElement('link');
+    style.setAttribute('href', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css');
+    style.setAttribute('rel', 'stylesheet');
+    style.setAttribute('type', 'text/css');
+    formPreviewWindow.document.head.appendChild(style);
+var l=0;
+rscriptstr="";
+//console.log(ghtml);
+for(l=0;l<=ghtml.length-8;l++)
+{
+rscriptstr=rscriptstr+ghtml[l];
+}
+rscriptstr=rscriptstr+"<input type='submit' onclick='Add()'>";
+rscriptstr=rscriptstr+'<script>';
+
+rscriptstr=rscriptstr+"function "+"Add"+"("+")"+"{";
+	check();
+
+	}
+
+});
+
+
+
+
+function check()
+{
+//document.write(ghtml);
+var val=ghtml;
+var divbord=document.getElementById("variables");
+
+var elediv=document.getElementById("variablesList");
+ghtml=ghtml.toString();
+//console.log(ghtml);
+var lab=document.getElementsByTagName("label");
+
+var i;
+var opt;
+var len=lab.length;
+var flag=0;
+var count=0;
+var j=0;
+var k;
+var ecount=0;
+for(i=0;i<len;i++)
+{
+
+if(lab[i].getAttribute("class")==="fb-radio-group-label"){flag=1;varflag=1;}
+if(lab[i].getAttribute("class")==="fb-checkbox-group-label"){flag=1;varflag=1;}
+if(lab[i].getAttribute("class")==="fb-date-label"){flag=1;varflag=1;}
+if(lab[i].getAttribute("class")==="fb-file-label"){flag=1;varflag=1;}
+if(lab[i].getAttribute("class")==="fb-select-label"){flag=1;varflag=1;}
+if(lab[i].getAttribute("class")==="fb-text-label"){flag=1;varflag=1;}
+if(lab[i].getAttribute("class")==="fb-textarea-label"){flag=1;varflag=1;}
+if(flag==1)
+{
+var xid;
+var xclas;
+opt=lab[i].innerHTML;
+var textEle=document.createElement("li");
+textEle.innerHTML=opt;
+textEle.setAttribute("id",count);
+textEle.setAttribute("draggable","true");
+textEle.setAttribute("ondragstart","drag(event)");
+elediv.appendChild(textEle);
+if(lab[i].getAttribute("class")==="fb-radio-group-label")
+{
+var num=0;
+var xclas=lab[i].getAttribute("for");
+var allrad=document.getElementsByTagName("input");
+
+for(k=0;k<allrad.length;k++)
+{
+if(allrad[k].getAttribute("type")=="radio")
+{
+
+if(allrad[k].getAttribute("name")==xclas)
+{
+generateRadioScript(allrad[k].getAttribute("id"),count);
+}
+}
+}
+
+//generateRadioScript();
+}
+
+if(lab[i].getAttribute("class")==="fb-checkbox-group-label")
+{
+var xclas=lab[i].getAttribute("for");
+var allchk=document.getElementsByTagName("input");
+for(k=0;k<allchk.length;k++)
+{
+if(allchk[k].getAttribute("type")=="checkbox")
+{
+if(allchk[k].getAttribute("name")==(xclas+"[]"))
+{
+generateCheckBoxScript(allchk[k].getAttribute("id"),count);
+}
+}
+}
+}
+if(lab[i].getAttribute("class")==="fb-date-label")
+{
+var xclas=lab[i].getAttribute("for");
+var allchk=document.getElementsByTagName("input");
+for(k=0;k<allchk.length;k++)
+{
+if(allchk[k].getAttribute("type")=="date")
+{
+if(allchk[k].getAttribute("name")==xclas)
+{
+generateDateScript(allchk[k].getAttribute("id"),count);
+}
+}
+}
+}
+
+if(lab[i].getAttribute("class")==="fb-select-label"){
+var xclas=lab[i].getAttribute("for");
+var allchk=document.getElementsByTagName("select");
+for(k=0;k<allchk.length;k++)
+{
+
+if(allchk[k].getAttribute("id")==xclas)
+{
+generateSelectScript(allchk[k].getAttribute("id"),count);
+}
+}
+
+
+}
+if(lab[i].getAttribute("class")==="fb-text-label")
+{
+var xclas=lab[i].getAttribute("for");
+//alert(xclas);
+var allchk=document.getElementsByTagName("input");
+for(k=0;k<allchk.length;k++)
+{
+if(allchk[k].getAttribute("type")=="text")
+{
+if(allchk[k].getAttribute("id")==xclas)
+{
+	
+generateTextScript(allchk[k].getAttribute("id"),count);
+}
+}
+
+}
+}
+
+if(lab[i].getAttribute("class")==="fb-textarea-label")
+{
+var xclas=lab[i].getAttribute("for");
+
+var allchk=document.getElementsByTagName("textarea");
+for(k=0;k<allchk.length;k++)
+{
+if(allchk[k].getAttribute("type")=="textarea")
+{
+if(allchk[k].getAttribute("id")==xclas)
+{
+	
+generateTextAreaScript(allchk[k].getAttribute("id"),count);
+}
+}
+
+}
+
+}
+flag=0;
+count++;
+}
+}
+
+//rscriptstr=rscriptstr
+//console.log(rscriptstr);
+//WriteData(rscriptstr);
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+      ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    ev.target.appendChild(document.getElementById(data));
+	
+	}
+	
+function generateDateScript(rid,count)
+{
+if(varflag==1)
+{
+rscriptstr=rscriptstr+"var opt"+count+";";
+varflag=0;
+}
+rscriptstr=rscriptstr+"opt"+count+"="+"document.getElementById('"+rid+"').value;";
+rscriptstr=rscriptstr.replace("-preview","");
+//console.log(rscriptstr);
+//WriteData(rscriptstr);
+}
+
+
+
+function generateRadioScript(rid,count)
+{
+if(varflag==1)
+{
+rscriptstr=rscriptstr+"var opt"+count+";";
+varflag=0;
+
+}
+//rid=rid.replace("preview-","");
+rscriptstr=rscriptstr+"if(document.getElementById('"+rid+"').checked==true){";
+var valuefor=document.getElementById(rid).value;
+
+
+
+rscriptstr=rscriptstr+"opt"+count+"="+"'"+valuefor+"'"+";}";
+rscriptstr=rscriptstr.replace("preview-","");
+//console.log(rscriptstr);
+//WriteData(rscriptstr);
+}
+
+
+
+function generateCheckBoxScript(rid,count)
+{
+if(varflag==1)
+{
+rscriptstr=rscriptstr+"var opt"+count+";";
+varflag=0;
+}
+
+rscriptstr=rscriptstr+"if(document.getElementById('"+rid+"').checked==true){";
+var valuefor=document.getElementById(rid).value;
+
+rscriptstr=rscriptstr+"opt"+count+"="+"'"+valuefor+"'"+";}";
+rscriptstr=rscriptstr.replace("preview-","");
+//console.log(rscriptstr);
+//WriteData(rscriptstr);
+}
+
+
+function generateSelectScript(rid,count)
+{
+if(varflag==1)
+{
+rscriptstr=rscriptstr+"var opt"+count+";";
+varflag=0;
+}
+
+rscriptstr=rscriptstr+"var temp=document.getElementById('"+rid+"');opt"+count+"=temp.options[temp.selectedIndex].text;";
+rscriptstr=rscriptstr.replace("-preview","");
+//console.log(rscriptstr);
+//WriteData(rscriptstr);
+}
+
+function generateTextScript(rid,count)
+{
+if(varflag==1)
+{
+rscriptstr=rscriptstr+"var opt"+count+";";
+varflag=0;
+}
+
+rid=rid.slice(0,rid.length-8);
+rscriptstr=rscriptstr+"opt"+count+"="+"document.getElementById('"+rid+"').value;";
+rscriptstr=rscriptstr.replace("preview-","");
+//console.log(rscriptstr);
+//WriteData(rscriptstr);
+}
+function generateTextAreaScript(rid,count)
+{
+if(varflag==1)
+{
+rscriptstr=rscriptstr+"var opt"+count+";";
+varflag=0;
+}
+
+rid=rid.slice(0,rid.length-8);
+rscriptstr=rscriptstr+"opt"+count+"="+"document.getElementById('"+rid+"').value;";
+rscriptstr=rscriptstr.replace("preview-","");
+//console.log(rscriptstr);
+//WriteData(rscriptstr);
+}
+function build()
+{
+rscriptstr=rscriptstr+"var message;message='";
+var data=document.getElementById("reportdiv").innerHTML;
+data=data.replace(/&nbsp;/g,'');
+data=data.replace(/&gt;/g,'');
+document.getElementById("reportdiv").innerHTML=data;
+//alert(data);
+var n=0;
+while(n!=-1)
+{
+data=document.getElementById("reportdiv").innerHTML;
+
+n=data.indexOf("<li");
+//alert("n="+n);
+var str="";
+if(n!=-1)
+{
+for(var i=0;i<=n-1;i++)
+{
+str=str+data[i];
+}
+data=data.slice(n,data.length);
+//console.log(data);
+document.getElementById("reportdiv").innerHTML="";
+document.getElementById("reportdiv").innerHTML=data;
+rscriptstr=rscriptstr+str;
+var liele=document.getElementById("reportdiv").getElementsByTagName("li");
+var j;
+
+var liid=liele[0].getAttribute("id");
+rscriptstr=rscriptstr+" "+"'+opt"+liid+"+' ";
+var lin=data.indexOf("</li>");
+data=data.slice(lin+5,data.length);
+document.getElementById("reportdiv").innerHTML="";
+document.getElementById("reportdiv").innerHTML=data;
+}
+}
+rscriptstr=rscriptstr+data+"';";
+document.getElementById("reportdiv").innerHTML="";
+rscriptstr=rscriptstr+"var txt=document.createElement('span');txt.textContent=message;var children = document.getElementById('reportdiv').childNodes;var found = false;for(var i = 0; i < children.length; i++) {if(editdivpos == children[i]) {document.getElementById('reportdiv').insertBefore(txt, children[i]);found = true;break;}}if(!found) {            document.getElementById('reportdiv').appendChild(txt);}";
+
+rscriptstr=rscriptstr+"}";
+//document.getElementById("reportdiv").innerHTML=rscriptstr;
+//console.log("the actual value here is ______________________");
+console.log(rscriptstr);
+//localStorage.setItem("data",rscriptstr);
+//WriteData(rscriptstr);
+var heading=document.getElementById("FormHeading").value;
+rscriptstr=rscriptstr.replace("&lt;","");
+rscriptstr=rscriptstr.replace("&gt;","");
+rscriptstr=encodeURIComponent(rscriptstr);
+window.location = "write.php?value=" + rscriptstr+"&heading="+heading; 
+
+}
+
+
+function allowDrop(ev) {
+   
+   ev.preventDefault();
+}
+
+</script>
+</html>
